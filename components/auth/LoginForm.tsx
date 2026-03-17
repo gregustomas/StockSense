@@ -21,29 +21,32 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { LoginFormData, loginSchema } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [firebaseError, setFirebaseError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
+  const onSubmit = async (data: LoginFormData) => {
+    setFirebaseError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, data.email, data.password);
       router.push("/dashboard");
-    } catch (err) {
-      setError("Invalid email or password");
-    } finally {
-      setLoading(false);
+    } catch {
+      setFirebaseError("Invalid email or password");
     }
   };
 
@@ -57,7 +60,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -65,10 +68,11 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  {...register("email")}
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-sm">{errors.email.message}</p>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -83,18 +87,24 @@ export function LoginForm({
                 <Input
                   id="password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  {...register("password")}
                 />
+                {errors.password && (
+                  <p className="text-red-500 text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
               </Field>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {firebaseError && (
+                <p className="text-red-500 text-sm">{firebaseError}</p>
+              )}
               <Field>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Logging in..." : "Login"}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Logging in..." : "Login"}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <Link href="/signup">Sign up</Link>
+                  Don&apos;t have an account?{" "}
+                  <Link href="/signup">Sign up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

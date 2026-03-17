@@ -16,52 +16,46 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { auth, db } from "@/lib/firebase";
+import { SignupFormData, signupSchema } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [firebaseError, setFirebaseError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+    mode: "onChange",
+  });
 
+  const onSubmit = async (data: SignupFormData) => {
+    setFirebaseError(null);
     try {
-      if (password !== confirmPassword) {
-        setError("Passwords do not match");
-        setLoading(false);
-        return;
-      }
-
-      const userCredential = await createUserWithEmailAndPassword(
+      const userCredentials = await createUserWithEmailAndPassword(
         auth,
-        email,
-        password,
+        data.email,
+        data.password,
       );
-
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        uid: userCredential.user.uid,
-        name,
-        email,
+      await setDoc(doc(db, "users", userCredentials.user.uid), {
+        uid: userCredentials.user.uid,
+        name: data.name,
+        email: data.email,
         role: "viewer",
         createdAt: new Date(),
       });
-
       router.push("/dashboard");
     } catch {
-      setError("Nepodařilo se vám zaregistrovat");
-    } finally {
-      setLoading(false);
+      setFirebaseError("Failed to create account");
     }
   };
 
@@ -74,7 +68,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSignup}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Full Name</FieldLabel>
@@ -82,10 +76,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 id="name"
                 type="text"
                 placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                {...register("name")}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+              )}
             </Field>
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -93,10 +88,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 id="email"
                 type="email"
                 placeholder="m@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
               <FieldDescription>
                 We&apos;ll use this to contact you. We will not share your email
                 with anyone else.
@@ -107,10 +103,13 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <Input
                 id="password"
                 type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+                {...register("password")}
+              />{" "}
+              {errors.password && (
+                <p className="text-red-500 text-sm">
+                  {errors.password.message}
+                </p>
+              )}
               <FieldDescription>
                 Must be at least 8 characters long.
               </FieldDescription>
@@ -122,17 +121,23 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <Input
                 id="confirm-password"
                 type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                {...register("confirmPassword")}
               />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+
               <FieldDescription>Please confirm your password.</FieldDescription>
             </Field>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {firebaseError && (
+              <p className="text-red-500 text-sm">{firebaseError}</p>
+            )}
             <FieldGroup>
               <Field>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Creating account..." : "Create Account"}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Creating account..." : "Create Account"}
                 </Button>
                 <FieldDescription className="px-6 text-center">
                   Already have an account? <Link href="/login">Log in</Link>
