@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { auth, db } from "@/lib/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -134,7 +135,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   {loading ? "Creating account..." : "Create Account"}
                 </Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="#">Sign in</a>
+                  Already have an account? <Link href="/login">Log in</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

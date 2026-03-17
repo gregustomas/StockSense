@@ -20,6 +20,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import Link from "next/link";
 
 export function LoginForm({
   className,
@@ -93,7 +94,7 @@ export function LoginForm({
                   {loading ? "Logging in..." : "Login"}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Don&apos;t have an account? <Link href="/signup">Sign up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

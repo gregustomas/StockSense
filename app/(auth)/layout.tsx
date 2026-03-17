@@ -4,13 +4,13 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { PropsWithChildren, useEffect } from "react";
 
-export default function DashboardLayout({ children }: PropsWithChildren) {
+export default function AuthLayout({ children }: PropsWithChildren) {
   const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
+    if (!loading && user) {
+      router.push("/dashboard");
     }
   }, [user, loading, router]);
 
@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
         </div>
       </div>
     );
-  if (!user) return null;
+  if (user) return null;
 
   return <>{children}</>;
 }
