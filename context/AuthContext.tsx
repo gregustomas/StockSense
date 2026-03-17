@@ -1,3 +1,5 @@
+"use client";
+
 import { auth, db } from "@/lib/firebase";
 import { User } from "@/types";
 import { onAuthStateChanged, signOut as firebaseSignOut } from "firebase/auth";
