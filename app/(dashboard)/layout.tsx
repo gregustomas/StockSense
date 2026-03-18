@@ -1,5 +1,7 @@
 "use client";
 
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { PropsWithChildren, useEffect } from "react";
@@ -25,5 +27,15 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
     );
   if (!user) return null;
 
-  return <>{children}</>;
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <AppSidebar />
+        <main className="flex-1 overflow-auto">
+          <SidebarTrigger />
+          {children}
+        </main>
+      </div>
+    </SidebarProvider>
+  );
 }
