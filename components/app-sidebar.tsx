@@ -16,6 +16,7 @@ import {
   ArrowLeftRightIcon,
   Settings2Icon,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 // This is sample data.
 const data = {
@@ -54,13 +55,21 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth();
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={{
+            name: user?.name ?? "User",
+            email: user?.email ?? "",
+            avatar: "",
+          }}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
