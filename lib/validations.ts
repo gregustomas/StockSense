@@ -26,6 +26,14 @@ export const productSchema = z.object({
   description: z.string().optional(),
 });
 
+export const movementSchema = z.object({
+  productId: z.string().min(1, "Select a product"),
+  type: z.enum(["in", "out", "adjustment"]),
+  quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
+  note: z.string().optional(),
+});
+
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
 export type ProductFormData = z.infer<typeof productSchema>;
+export type MovementFormData = z.infer<typeof movementSchema>;

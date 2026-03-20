@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export type UserRole = "admin" | "manager" | "viewer";
 
 export interface User {
@@ -5,7 +7,7 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
-  createdAt: Date;
+  createdAt: Date | Timestamp;
 }
 
 export interface Category {
@@ -23,8 +25,8 @@ export interface Product {
   minQuantity: number;
   unit: string;
   description?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | Timestamp;
+  updatedAt: Date | Timestamp;
 }
 
 export type MovementType = "in" | "out" | "adjustment";
@@ -36,5 +38,5 @@ export interface StockMovement {
   quantity: number;
   note?: string;
   createdBy: string;
-  createdAt: Date;
+  createdAt: Date | Timestamp;
 }
