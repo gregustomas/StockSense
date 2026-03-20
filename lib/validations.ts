@@ -17,5 +17,15 @@ export const signupSchema = z
     path: ["confirmPassword"],
   });
 
+export const productSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  sku: z.string().min(1, "SKU is required"),
+  quantity: z.coerce.number().min(0, "Quantity must be 0 or more"),
+  minQuantity: z.coerce.number().min(0, "Min quantity must be 0 or more"),
+  unit: z.string().min(1, "Unit is required"),
+  description: z.string().optional(),
+});
+
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
+export type ProductFormData = z.infer<typeof productSchema>;

@@ -1,0 +1,75 @@
+"use client";
+
+import { AddProductModal } from "@/components/inventory/AddProductModal";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useProducts } from "@/hooks/useProducts";
+
+export default function ProductsPage() {
+  const { products, loading } = useProducts();
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner />
+          <p className="text-muted-foreground text-sm">Loading products...</p>
+        </div>
+      </div>
+    );
+  return (
+    <div className="flex flex-col gap-6 p-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Products</h1>
+        <AddProductModal />
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>SKU</TableHead>
+            <TableHead>Quantity</TableHead>
+            <TableHead>Min Quantity</TableHead>
+            <TableHead>Unit</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {products.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                className="text-center text-muted-foreground"
+              >
+                No products yet
+              </TableCell>
+            </TableRow>
+          ) : (
+            products.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.sku}</TableCell>
+                <TableCell>{product.quantity}</TableCell>
+                <TableCell>{product.minQuantity}</TableCell>
+                <TableCell>{product.unit}</TableCell>
+                <TableCell>
+                  {product.quantity <= product.minQuantity
+                    ? "Low Stock"
+                    : "In Stock"}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}

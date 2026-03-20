@@ -2,6 +2,7 @@
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { PropsWithChildren, useEffect } from "react";
@@ -20,7 +21,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <Spinner />
           <p className="text-muted-foreground text-sm">Loading...</p>
         </div>
       </div>
