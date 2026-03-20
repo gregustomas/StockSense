@@ -12,20 +12,11 @@ import {
 } from "@/components/ui/table";
 import { useMovements } from "@/hooks/useMovements";
 import { useProducts } from "@/hooks/useProducts";
-import { Timestamp } from "firebase/firestore";
+import { formatDate, getProductName } from "@/lib/utils";
 
 export default function MovementsPage() {
   const { movements, loading } = useMovements();
   const { products } = useProducts();
-
-  const getProductName = (productId: string) => {
-    return products.find((p) => p.id === productId)?.name ?? "Unknown";
-  };
-
-  const formatDate = (date: Date | Timestamp) => {
-    if (date instanceof Date) return date.toLocaleDateString();
-    return new Date(date.seconds * 1000).toLocaleDateString();
-  };
 
   if (loading)
     return (
@@ -64,7 +55,9 @@ export default function MovementsPage() {
           ) : (
             movements.map((movement) => (
               <TableRow key={movement.id}>
-                <TableCell>{getProductName(movement.productId)}</TableCell>
+                <TableCell>
+                  {getProductName(products, movement.productId)}
+                </TableCell>
                 <TableCell>{movement.type}</TableCell>
                 <TableCell>{movement.quantity}</TableCell>
                 <TableCell>{movement.note ?? "-"}</TableCell>
