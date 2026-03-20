@@ -12,11 +12,13 @@ import {
 } from "@/components/ui/table";
 import { useMovements } from "@/hooks/useMovements";
 import { useProducts } from "@/hooks/useProducts";
+import { useRole } from "@/hooks/useRole";
 import { formatDate, getProductName } from "@/lib/utils";
 
 export default function MovementsPage() {
   const { movements, loading } = useMovements();
   const { products } = useProducts();
+  const { canEdit } = useRole();
 
   if (loading)
     return (
@@ -29,7 +31,7 @@ export default function MovementsPage() {
     <div className="flex flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Stock Movements</h1>
-        <AddMovementModal />
+        {canEdit && <AddMovementModal />}
       </div>
 
       <Table>

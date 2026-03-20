@@ -11,9 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useProducts } from "@/hooks/useProducts";
+import { useRole } from "@/hooks/useRole";
 
 export default function ProductsPage() {
   const { products, loading } = useProducts();
+  const { canEdit } = useRole();
 
   if (loading)
     return (
@@ -28,7 +30,7 @@ export default function ProductsPage() {
     <div className="flex flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Products</h1>
-        <AddProductModal />
+        {canEdit && <AddProductModal />}
       </div>
 
       <Table>
