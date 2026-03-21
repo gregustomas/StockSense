@@ -1,6 +1,9 @@
 "use client";
 
 import { AddProductModal } from "@/components/inventory/AddProductModal";
+import { EditProductModal } from "@/components/inventory/EditProductModal";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
@@ -13,12 +16,18 @@ import {
 import { useCategories } from "@/hooks/useCategories";
 import { useProducts } from "@/hooks/useProducts";
 import { useRole } from "@/hooks/useRole";
+import { db } from "@/lib/firebase";
 import { getCategoryName } from "@/lib/utils";
+import { deleteDoc, doc } from "firebase/firestore";
 
 export default function ProductsPage() {
   const { products, loading } = useProducts();
   const { canEdit } = useRole();
   const { categories } = useCategories();
+
+  const handleDelete = async (id: string) => {
+    await deleteDoc(doc(db, "products", id));
+  };
 
   if (loading)
     return (
@@ -29,6 +38,7 @@ export default function ProductsPage() {
         </div>
       </div>
     );
+
   return (
     <div className="flex flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
@@ -46,6 +56,7 @@ export default function ProductsPage() {
             <TableHead>Unit</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Status</TableHead>
+            {canEdit && <TableHead>Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -70,9 +81,31 @@ export default function ProductsPage() {
                   {getCategoryName(categories, product.categoryId)}
                 </TableCell>
                 <TableCell>
-                  {product.quantity <= product.minQuantity
-                    ? "Low Stock"
-                    : "In Stock"}
+                  <Badge
+                    variant={
+                      product.quantity <= product.minQuantity
+                        ? "destructive"
+                        : "default"
+                    }
+                  >
+                    {product.quantity <= product.minQuantity
+                      ? "Low Stock"
+                      : "In Stock"}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {canEdit && (
+                    <div className="flex gap-2">
+                      <EditProductModal product={product} />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(product.id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             ))
