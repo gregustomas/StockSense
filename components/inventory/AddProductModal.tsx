@@ -16,14 +16,24 @@ import { db } from "@/lib/firebase";
 import { Button } from "../ui/button";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { useCategories } from "@/hooks/useCategories";
 
 export function AddProductModal() {
   const [open, setOpen] = useState(false);
+  const { categories } = useCategories();
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -33,7 +43,6 @@ export function AddProductModal() {
     try {
       await addDoc(collection(db, "products"), {
         ...data,
-        categoryId: "",
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -59,7 +68,7 @@ export function AddProductModal() {
             <Field>
               <FieldLabel>Name</FieldLabel>
               <Input {...register("name")} />
-              {errors && (
+              {errors.name && (
                 <p className="text-red-500 text-sm">{errors.name?.message}</p>
               )}
             </Field>
@@ -96,6 +105,21 @@ export function AddProductModal() {
               {errors.unit && (
                 <p className="text-red-500 text-sm">{errors.unit.message}</p>
               )}
+            </Field>
+            <Field>
+              <FieldLabel>Category</FieldLabel>
+              <Select onValueChange={(val) => setValue("categoryId", val)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <Field>
               <FieldLabel>Description</FieldLabel>

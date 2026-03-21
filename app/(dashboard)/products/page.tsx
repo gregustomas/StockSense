@@ -10,12 +10,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useCategories } from "@/hooks/useCategories";
 import { useProducts } from "@/hooks/useProducts";
 import { useRole } from "@/hooks/useRole";
+import { getCategoryName } from "@/lib/utils";
 
 export default function ProductsPage() {
   const { products, loading } = useProducts();
   const { canEdit } = useRole();
+  const { categories } = useCategories();
 
   if (loading)
     return (
@@ -41,6 +44,7 @@ export default function ProductsPage() {
             <TableHead>Quantity</TableHead>
             <TableHead>Min Quantity</TableHead>
             <TableHead>Unit</TableHead>
+            <TableHead>Category</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -62,6 +66,9 @@ export default function ProductsPage() {
                 <TableCell>{product.quantity}</TableCell>
                 <TableCell>{product.minQuantity}</TableCell>
                 <TableCell>{product.unit}</TableCell>
+                <TableCell>
+                  {getCategoryName(categories, product.categoryId)}
+                </TableCell>
                 <TableCell>
                   {product.quantity <= product.minQuantity
                     ? "Low Stock"
