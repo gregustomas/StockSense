@@ -1,9 +1,14 @@
 "use client";
 
 import { AddCategoryModal } from "@/components/inventory/AddCategoryModal";
+import { EditCategoryModal } from "@/components/inventory/EditCategoryModal ";
+
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCategories } from "@/hooks/useCategories";
 import { useRole } from "@/hooks/useRole";
+import { db } from "@/lib/firebase";
+import { deleteDoc, doc } from "firebase/firestore";
 
 export default function SettingsPage() {
   const { categories, loading } = useCategories();
@@ -15,6 +20,10 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Access denied.</p>
       </div>
     );
+
+  const handleDelete = async (id: string) => {
+    await deleteDoc(doc(db, "categories", id));
+  };
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -43,6 +52,16 @@ export default function SettingsPage() {
                         {category.description}
                       </p>
                     )}
+                  </div>
+                  <div className="flex gap-2">
+                    <EditCategoryModal category={category} />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(category.id)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </li>
               ))}

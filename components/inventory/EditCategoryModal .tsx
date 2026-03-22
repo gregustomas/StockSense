@@ -11,13 +11,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { addDoc, collection } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Button } from "../ui/button";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { Category } from "@/types";
 
-export function AddCategoryModal() {
+interface EditCategoryModalProps {
+  category: Category;
+}
+
+export function EditCategoryModal({ category }: EditCategoryModalProps) {
   const [open, setOpen] = useState(false);
 
   const {
@@ -27,29 +32,33 @@ export function AddCategoryModal() {
     formState: { errors, isSubmitting },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: category.name,
+      description: category.description,
+    },
   });
 
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      await addDoc(collection(db, "categories"), {
+      await updateDoc(doc(db, "categories", category.id), {
         ...data,
       });
 
       reset();
       setOpen(false);
     } catch {
-      console.error("Failed to add category");
+      console.error("Failed to update category");
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add Category</Button>
+        <Button size="sm">Edit Category</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Category</DialogTitle>
+          <DialogTitle>Edit Category</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
@@ -65,7 +74,7 @@ export function AddCategoryModal() {
               <Input {...register("description")} />
             </Field>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Adding..." : "Add Category"}
+              {isSubmitting ? "Updating..." : "Update Category"}
             </Button>
           </FieldGroup>
         </form>

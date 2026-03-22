@@ -142,7 +142,7 @@ export function EditProductModal({ product }: EditProductModalProps) {
               <Input {...register("description")} />
             </Field>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Editing..." : "Edit Product"}
+              {isSubmitting ? "Updating..." : "Update Category"}
             </Button>
           </FieldGroup>
         </form>
