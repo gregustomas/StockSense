@@ -15,41 +15,36 @@ import {
   PackageIcon,
   ArrowLeftRightIcon,
   Settings2Icon,
+  UsersIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-// This is sample data.
 const data = {
-  user: {
-    name: "User",
-    email: "",
-    avatar: "",
-  },
   navMain: [
     {
       title: "Dashboard",
       url: "/dashboard",
       icon: <LayoutDashboardIcon />,
-      isActive: true,
-      items: [],
     },
     {
       title: "Products",
-      url: "/dashboard/products",
+      url: "/products",
       icon: <PackageIcon />,
-      items: [],
     },
     {
       title: "Stock Movements",
-      url: "/dashboard/movements",
+      url: "/movements",
       icon: <ArrowLeftRightIcon />,
-      items: [],
+    },
+    {
+      title: "Users",
+      url: "/users",
+      icon: <UsersIcon />,
     },
     {
       title: "Settings",
-      url: "/dashboard/settings",
+      url: "/settings",
       icon: <Settings2Icon />,
-      items: [],
     },
   ],
 };
