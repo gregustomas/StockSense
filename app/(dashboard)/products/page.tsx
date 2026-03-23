@@ -2,6 +2,7 @@
 
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import { EditProductModal } from "@/components/inventory/EditProductModal";
+import { ProductDetailModal } from "@/components/inventory/ProductDetailModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -73,7 +74,9 @@ export default function ProductsPage() {
           ) : (
             products.map((product) => (
               <TableRow key={product.id}>
-                <TableCell>{product.name}</TableCell>
+                <TableCell>
+                  <ProductDetailModal product={product} />
+                </TableCell>
                 <TableCell>{product.sku}</TableCell>
                 <TableCell>{product.quantity}</TableCell>
                 <TableCell>{product.minQuantity}</TableCell>
