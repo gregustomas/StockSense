@@ -4,6 +4,7 @@ import { AddProductModal } from "@/components/inventory/AddProductModal";
 import { EditProductModal } from "@/components/inventory/EditProductModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
@@ -97,13 +98,14 @@ export default function ProductsPage() {
                   {canEdit && (
                     <div className="flex gap-2">
                       <EditProductModal product={product} />
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(product.id)}
+                      <ConfirmDialog
+                        onConfirm={() => handleDelete(product.id)}
+                        description="This will permanently delete the product."
                       >
-                        Delete
-                      </Button>
+                        <Button variant="destructive" size="sm">
+                          Delete
+                        </Button>
+                      </ConfirmDialog>
                     </div>
                   )}
                 </TableCell>

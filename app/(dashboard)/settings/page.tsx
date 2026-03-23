@@ -5,6 +5,7 @@ import { EditCategoryModal } from "@/components/inventory/EditCategoryModal ";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useCategories } from "@/hooks/useCategories";
 import { useRole } from "@/hooks/useRole";
 import { db } from "@/lib/firebase";
@@ -55,13 +56,14 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex gap-2">
                     <EditCategoryModal category={category} />
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(category.id)}
+                    <ConfirmDialog
+                      onConfirm={() => handleDelete(category.id)}
+                      description="This will permanently delete the category."
                     >
-                      Delete
-                    </Button>
+                      <Button variant="destructive" size="sm">
+                        Delete
+                      </Button>
+                    </ConfirmDialog>
                   </div>
                 </li>
               ))}
