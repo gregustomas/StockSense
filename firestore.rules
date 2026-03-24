@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // helper funkce — načte roli přihlášeného uživatele
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserRole() == "admin";
+    }
+
+    function isManager() {
+      return isSignedIn() && getUserRole() == "manager";
+    }
+
+    function isViewer() {
+      return isSignedIn() && getUserRole() == "viewer";
+    }
+
+    function canEdit() {
+      return isAdmin() || isManager();
+    }
+
+    // Users kolekce — jen admin může měnit role
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Products — viewer může číst, manager/admin může editovat
+    match /products/{productId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if canEdit();
+    }
+
+    // Categories — jen admin může spravovat
+    match /categories/{categoryId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Movements — viewer může číst, manager/admin může přidávat
+    match /movements/{movementId} {
+      allow read: if isSignedIn();
+      allow create: if canEdit();
+      allow update, delete: if isAdmin();
+    }
+
+  }
+}
