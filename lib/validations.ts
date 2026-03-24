@@ -23,7 +23,7 @@ export const productSchema = z.object({
   quantity: z.coerce.number().min(0, "Quantity must be 0 or more"),
   minQuantity: z.coerce.number().min(0, "Min quantity must be 0 or more"),
   unit: z.string().min(1, "Unit is required"),
-  categoryId: z.string().min(1, "Category is required"),
+  categoryId: z.string().min(1, "Category is required").optional(),
   description: z.string().optional(),
 });
 

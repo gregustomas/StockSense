@@ -2,6 +2,7 @@
 
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import { EditProductModal } from "@/components/inventory/EditProductModal";
+import { InventoryFilters } from "@/components/inventory/InventoryFilters";
 import { ProductDetailModal } from "@/components/inventory/ProductDetailModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,13 +20,64 @@ import { useCategories } from "@/hooks/useCategories";
 import { useProducts } from "@/hooks/useProducts";
 import { useRole } from "@/hooks/useRole";
 import { db } from "@/lib/firebase";
-import { getCategoryName } from "@/lib/utils";
+import { getCategoryName, timestampToDate } from "@/lib/utils";
 import { deleteDoc, doc } from "firebase/firestore";
+import { useMemo, useState } from "react";
 
 export default function ProductsPage() {
   const { products, loading } = useProducts();
   const { canEdit } = useRole();
   const { categories } = useCategories();
+
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "all",
+    status: "all",
+    sort: "newest",
+  });
+
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    if (filters.search) {
+      const s = filters.search.toLowerCase();
+      result = result.filter(
+        (product) =>
+          product.name.toLowerCase().includes(s) ||
+          product.sku.toLowerCase().includes(s),
+      );
+    }
+
+    if (filters.category !== "all") {
+      result = result.filter(
+        (product) => product.categoryId === filters.category,
+      );
+    }
+
+    if (filters.status != "all") {
+      result = result.filter((product) => {
+        const isLow = product.quantity <= product.minQuantity;
+        return filters.status === "low" ? isLow : !isLow;
+      });
+    }
+
+    result.sort((a, b) => {
+      const dateA: Date = timestampToDate(a.createdAt);
+      const dateB: Date = timestampToDate(b.createdAt);
+
+      if (filters.sort === "newest") {
+        return dateB.getTime() - dateA.getTime();
+      } else {
+        return dateA.getTime() - dateB.getTime();
+      }
+    });
+
+    return result;
+  }, [products, filters]);
+
+  const resetFilters = () => {
+    setFilters({ search: "", category: "all", status: "all", sort: "newest" });
+  };
 
   const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, "products", id));
@@ -47,6 +99,12 @@ export default function ProductsPage() {
         <h1 className="text-2xl font-bold">Products</h1>
         {canEdit && <AddProductModal />}
       </div>
+
+      <InventoryFilters
+        onFilterChange={setFilters}
+        onFilterReset={resetFilters}
+        activeFilters={filters}
+      />
 
       <Table>
         <TableHeader>
@@ -71,8 +129,17 @@ export default function ProductsPage() {
                 No products yet
               </TableCell>
             </TableRow>
+          ) : filteredProducts.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                className="text-center text-muted-foreground"
+              >
+                No products match your filters
+              </TableCell>
+            </TableRow>
           ) : (
-            products.map((product) => (
+            filteredProducts.map((product) => (
               <TableRow key={product.id}>
                 <TableCell>
                   <ProductDetailModal product={product} />
