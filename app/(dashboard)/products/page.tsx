@@ -1,5 +1,6 @@
 "use client";
 
+import { AddMovementModal } from "@/components/inventory/AddMovementModal";
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import { EditProductModal } from "@/components/inventory/EditProductModal";
 import { InventoryFilters } from "@/components/inventory/InventoryFilters";
@@ -22,6 +23,7 @@ import { useRole } from "@/hooks/useRole";
 import { db } from "@/lib/firebase";
 import { getCategoryName, timestampToDate } from "@/lib/utils";
 import { deleteDoc, doc } from "firebase/firestore";
+import { ArrowUpDown, Edit, Plus, Trash, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export default function ProductsPage() {
@@ -167,13 +169,14 @@ export default function ProductsPage() {
                 <TableCell>
                   {canEdit && (
                     <div className="flex gap-2">
-                      <EditProductModal product={product} />
+                      <AddMovementModal size="sm" icon={ArrowUpDown} />
+                      <EditProductModal product={product} icon={Edit} />
                       <ConfirmDialog
                         onConfirm={() => handleDelete(product.id)}
                         description="This will permanently delete the product."
                       >
                         <Button variant="destructive" size="sm">
-                          Delete
+                          <Trash2 />
                         </Button>
                       </ConfirmDialog>
                     </div>

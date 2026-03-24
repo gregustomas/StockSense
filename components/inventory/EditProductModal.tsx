@@ -25,12 +25,21 @@ import {
 } from "../ui/select";
 import { useCategories } from "@/hooks/useCategories";
 import { Product } from "@/types";
+import { LucideIcon } from "lucide-react";
 
 interface EditProductModalProps {
   product: Product;
+  size?: "default" | "sm";
+  icon?: LucideIcon;
+  label?: string;
 }
 
-export function EditProductModal({ product }: EditProductModalProps) {
+export function EditProductModal({
+  product,
+  size = "sm",
+  icon: Icon,
+  label,
+}: EditProductModalProps) {
   const [open, setOpen] = useState(false);
   const { categories } = useCategories();
 
@@ -70,7 +79,10 @@ export function EditProductModal({ product }: EditProductModalProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">Edit Product</Button>
+        <Button size={size}>
+          {Icon && <Icon className="h-4 w-4" />}
+          {label ? <span>{label}</span> : !Icon && "Edit Product"}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

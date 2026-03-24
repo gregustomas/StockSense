@@ -31,8 +31,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { LucideIcon } from "lucide-react";
 
-export function AddMovementModal() {
+interface AddMovementModalProps {
+  size?: "default" | "sm";
+  icon?: LucideIcon;
+  label?: string;
+}
+
+export function AddMovementModal({
+  size,
+  icon: Icon,
+  label,
+}: AddMovementModalProps) {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const { products } = useProducts();
@@ -81,7 +92,11 @@ export function AddMovementModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add Movement</Button>
+        <Button size={size}>
+          {Icon && <Icon className="h-4 w-4" />}
+          {label && <span>{label}</span>}
+          {!label && !Icon && "Add Movement"}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
