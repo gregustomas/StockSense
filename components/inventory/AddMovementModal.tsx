@@ -11,13 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import {
-  addDoc,
-  collection,
-  doc,
-  increment,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, doc, increment, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Button } from "../ui/button";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
@@ -32,14 +26,18 @@ import {
   SelectValue,
 } from "../ui/select";
 import { LucideIcon } from "lucide-react";
+import { getProductName } from "@/lib/utils";
+import { ProductCombobox } from "./ProductCombobox";
 
 interface AddMovementModalProps {
+  productId?: string;
   size?: "default" | "sm";
   icon?: LucideIcon;
   label?: string;
 }
 
 export function AddMovementModal({
+  productId,
   size,
   icon: Icon,
   label,
@@ -53,34 +51,48 @@ export function AddMovementModal({
     handleSubmit,
     reset,
     setValue,
+    watch,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<MovementFormData>({
     resolver: zodResolver(movementSchema),
-    defaultValues: { type: "in" },
+    defaultValues: {
+      type: "in",
+      productId: productId ?? "",
+    },
   });
 
   const onSubmit = async (data: MovementFormData) => {
     try {
+      // 0. validace
+      if (data.type === "out") {
+        const product = products.find((p) => p.id === data.productId);
+        if (!product || product.quantity < data.quantity) {
+          setError("quantity", {
+            message: `Not enough stock. Available: ${product?.quantity ?? 0}`,
+          });
+          return;
+        }
+      }
+
       // 1. ulož pohyb do movements kolekce
-      await addDoc(collection(db, "movements"), {
+      const batch = writeBatch(db);
+
+      const quantityChange =
+        data.type === "in" ? data.quantity : -data.quantity;
+
+      const movementRef = collection(db, "movements");
+      batch.set(doc(movementRef), {
         ...data,
-        createdBy: user?.uid ?? "",
+        createdBy: user?.uid,
         createdAt: new Date(),
       });
-
-      // 2. aktualizuj quantity na produktu
-      const productRef = doc(db, "products", data.productId);
-      const quantityChange =
-        data.type === "in"
-          ? data.quantity
-          : data.type === "out"
-            ? -data.quantity
-            : data.quantity; // adjustment nastaví absolutní hodnotu
-
-      await updateDoc(productRef, {
+      batch.update(doc(db, "products", data.productId), {
         quantity: increment(quantityChange),
         updatedAt: new Date(),
       });
+
+      await batch.commit();
 
       reset();
       setOpen(false);
@@ -106,24 +118,23 @@ export function AddMovementModal({
           <FieldGroup>
             <Field>
               <FieldLabel>Product</FieldLabel>
-              <Select onValueChange={(val) => setValue("productId", val)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select product" />
-                </SelectTrigger>
-                <SelectContent>
-                  {products.map((product) => (
-                    <SelectItem key={product.id} value={product.id}>
-                      {product.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {productId ? (
+                <Input value={getProductName(products, productId)} disabled />
+              ) : (
+                <ProductCombobox
+                  products={products}
+                  value={watch("productId")}
+                  onChange={(val) => setValue("productId", val)}
+                />
+              )}
+
               {errors.productId && (
                 <p className="text-red-500 text-sm">
                   {errors.productId.message}
                 </p>
               )}
             </Field>
+
             <Field>
               <FieldLabel>Type</FieldLabel>
               <Select
@@ -138,7 +149,7 @@ export function AddMovementModal({
                 <SelectContent>
                   <SelectItem value="in">In</SelectItem>
                   <SelectItem value="out">Out</SelectItem>
-                  <SelectItem value="adjustment">Adjustment</SelectItem>
+                  {/* <SelectItem value="adjustment">Adjustment</SelectItem> */}
                 </SelectContent>
               </Select>
             </Field>

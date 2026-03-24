@@ -169,7 +169,11 @@ export default function ProductsPage() {
                 <TableCell>
                   {canEdit && (
                     <div className="flex gap-2">
-                      <AddMovementModal size="sm" icon={ArrowUpDown} />
+                      <AddMovementModal
+                        productId={product.id}
+                        size="sm"
+                        icon={ArrowUpDown}
+                      />
                       <EditProductModal product={product} icon={Edit} />
                       <ConfirmDialog
                         onConfirm={() => handleDelete(product.id)}
