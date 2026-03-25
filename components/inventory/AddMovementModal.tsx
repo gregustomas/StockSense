@@ -34,6 +34,7 @@ interface AddMovementModalProps {
   size?: "default" | "sm";
   icon?: LucideIcon;
   label?: string;
+  className?: string;
 }
 
 export function AddMovementModal({
@@ -41,6 +42,7 @@ export function AddMovementModal({
   size,
   icon: Icon,
   label,
+  className,
 }: AddMovementModalProps) {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
@@ -104,7 +106,7 @@ export function AddMovementModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size={size}>
+        <Button size={size} className={className}>
           {Icon && <Icon className="h-4 w-4" />}
           {label && <span>{label}</span>}
           {!label && !Icon && "Add Movement"}

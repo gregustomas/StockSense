@@ -1,6 +1,8 @@
 "use client";
 
 import { AddMovementModal } from "@/components/inventory/AddMovementModal";
+import { ProductDetailModal } from "@/components/inventory/ProductDetailModal";
+import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
@@ -19,6 +21,9 @@ export default function MovementsPage() {
   const { movements, loading } = useMovements();
   const { products } = useProducts();
   const { canEdit } = useRole();
+
+  const getProduct = (productId: string) =>
+    products.find((p) => p.id === productId);
 
   if (loading)
     return (
@@ -58,9 +63,21 @@ export default function MovementsPage() {
             movements.map((movement) => (
               <TableRow key={movement.id}>
                 <TableCell>
-                  {getProductName(products, movement.productId)}
+                  {getProduct(movement.productId) ? (
+                    <ProductDetailModal
+                      product={getProduct(movement.productId)!}
+                    />
+                  ) : (
+                    getProductName(products, movement.productId)
+                  )}
                 </TableCell>
-                <TableCell>{movement.type}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={movement.type === "in" ? "default" : "destructive"}
+                  >
+                    {movement.type.toUpperCase()}
+                  </Badge>
+                </TableCell>
                 <TableCell>{movement.quantity}</TableCell>
                 <TableCell>{movement.note ?? "-"}</TableCell>
                 <TableCell>{formatDate(movement.createdAt)}</TableCell>

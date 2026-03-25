@@ -32,6 +32,7 @@ interface EditProductModalProps {
   size?: "default" | "sm";
   icon?: LucideIcon;
   label?: string;
+  className?: string;
 }
 
 export function EditProductModal({
@@ -39,6 +40,7 @@ export function EditProductModal({
   size = "sm",
   icon: Icon,
   label,
+  className,
 }: EditProductModalProps) {
   const [open, setOpen] = useState(false);
   const { categories } = useCategories();
@@ -79,7 +81,7 @@ export function EditProductModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size={size}>
+        <Button size={size} className={className}>
           {Icon && <Icon className="h-4 w-4" />}
           {label ? <span>{label}</span> : !Icon && "Edit Product"}
         </Button>

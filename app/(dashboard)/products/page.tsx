@@ -174,7 +174,7 @@ export default function ProductsPage() {
                         size="sm"
                         icon={ArrowUpDown}
                       />
-                      <EditProductModal product={product} icon={Edit} />
+                      <EditProductModal product={product} icon={Edit} className="bg-edit/50 text-edit-foreground" />
                       <ConfirmDialog
                         onConfirm={() => handleDelete(product.id)}
                         description="This will permanently delete the product."
