@@ -6,50 +6,71 @@ Real-time inventory management system built with Next.js, TypeScript and Firebas
 
 ---
 
-## Features
+## Dashboard
 
-### Dashboard
+![Dashboard](public/dashboard.png)
 
-- Real-time stats — total products, low stock alerts, movements today
-- Recent movements table with 7-day filter and pagination
-- Low stock products list with pagination
-- Movements chart — last 7 days (in/out)
-- Quick actions — add product or movement directly from dashboard
+Live stats — total products, low stock count and today's movements. Recent movements table (last 7 days) with pagination, low stock product list and a bar chart showing in/out activity over the past week. Quick actions for adding a product or movement directly from the dashboard.
 
-### Products
+---
 
-- Full product management — add, edit, delete
-- Product detail modal with movement history
-- Search by name or SKU
-- Filter by category and stock status
-- Sort by newest/oldest/name
-- Low stock badge when quantity falls below minimum
-- Category assignment
+## Products
 
-### Stock Movements
+<table>
+  <tr>
+    <td width="50%"><img src="public/products.png" alt="Products"/></td>
+    <td width="50%"><img src="public/edit.png" alt="Edit Product"/></td>
+  </tr>
+  <tr>
+    <td><sub>Product list with search, category filter, status filter and sorting.</sub></td>
+    <td><sub>Edit modal — name, SKU, quantity, min quantity, unit, category and description.</sub></td>
+  </tr>
+</table>
 
-- Record stock in/out with quantity and note
-- Product combobox with search and category grouping
-- Atomic batch writes — movement + product quantity updated together
-- Stock validation — prevents out movement when quantity is 0
-- Movement history per product in product detail
+<table>
+  <tr>
+    <td width="50%"><img src="public/detail.png" alt="Product Detail"/></td>
+    <td width="50%"></td>
+  </tr>
+  <tr>
+    <td><sub>Product detail modal with full movement history.</sub></td>
+    <td></td>
+  </tr>
+</table>
 
-### Categories
+Add, edit and delete products with SKU, category, unit and minimum quantity. Low stock badge shown automatically when quantity drops below the minimum.
 
-- Add, edit, delete categories
-- Products assigned to categories
+---
 
-### Users
+## Stock Movements
 
-- User list with roles
-- Role assignment — Admin, Manager, Viewer
-- Role-based access control throughout the app
+<table>
+  <tr>
+    <td width="50%"><img src="public/movements.png" alt="Stock Movements"/></td>
+    <td width="50%"><img src="public/stock-movements.png" alt="Add Movement"/></td>
+  </tr>
+  <tr>
+    <td><sub>Full movement history with IN/OUT badges, quantity, note and date.</sub></td>
+    <td><sub>Add movement modal — product combobox with search and category grouping.</sub></td>
+  </tr>
+</table>
 
-### Auth
+Record stock in/out with quantity and an optional note. Movements and product quantity are updated atomically. Out movement is blocked when quantity is 0.
 
-- Email/Password registration and login
-- Zod + React Hook Form validation
-- Route protection via layout guards
+---
+
+## Users & Settings
+
+<table>
+  <tr>
+    <td width="50%"><img src="public/users.png" alt="Users"/></td>
+    <td width="50%"><img src="public/settings.png" alt="Settings"/></td>
+  </tr>
+  <tr>
+    <td><sub>User list with role assignment — Admin, Manager, Viewer.</sub></td>
+    <td><sub>Category management — add, edit and delete.</sub></td>
+  </tr>
+</table>
 
 ---
 
